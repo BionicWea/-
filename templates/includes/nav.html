@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #20a8d8;">
+    <div class="container justify-content-center">
+        <a class="navbar-brand" href="{{ url_for('index.admin_dashboard') }}">学生成绩管理系统</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <!-- 管理员主页 -->
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('index.admin_dashboard') }}">管理员主页</a>
+                </li>
+
+                <!-- 学院管理 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('colleges.list_colleges') }}">学院管理</a>
+                </li>
+                <!-- 班级管理 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('classrooms.list_classrooms') }}">班级管理</a>
+                </li>
+                <!-- 课程管理 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('courses.list_courses') }}">课程管理</a>
+                </li>
+                <!-- 回收站 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('scores.trash_scores') }}">回收站</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

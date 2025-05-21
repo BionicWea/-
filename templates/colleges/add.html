@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}添加学院{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">添加学院</h1>
+    <p class="mb-4">填写以下信息添加新学院。</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">添加学院表单</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('colleges.add_college') }}" method="post">
+                <div class="form-group">
+                    <label for="college_id">学院编号:</label>
+                    <input type="text" class="form-control" id="college_id" name="college_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="college_name">学院名称:</label>
+                    <input type="text" class="form-control" id="college_name" name="college_name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">提交</button>
+                <a href="{{ url_for('colleges.list_colleges') }}" class="btn btn-secondary">取消</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

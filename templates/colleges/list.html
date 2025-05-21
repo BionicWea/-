@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}学院列表{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">学院管理</h1>
+    <p class="mb-4">以下是系统中的学院列表。</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">学院列表</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <a href="{{ url_for('colleges.add_college') }}" class="btn btn-primary btn-sm mb-3">新增学院</a>
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>学院编号</th>
+                            <th>学院名称</th>
+                            <th>创建时间</th>
+                            <th>班级数量</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for college in colleges %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ college.college_id }}</td>
+                            <td>{{ college.college_name }}</td>
+                            <td>{{ college.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <a href="{{ url_for('classrooms.list_classrooms_by_college', college_id=college._id) }}">{{ college.classroom_count }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('colleges.edit_college', id=college._id) }}" class="btn btn-warning btn-sm">编辑</a>
+                                <form action="{{ url_for('colleges.delete_college', id=college._id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定删除该学院吗？');">删除</button>
+                                </form>
+                                {% if college.is_deleted %}
+                                <form action="{{ url_for('colleges.restore_college', id=college._id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('确定恢复该学院吗？');">恢复</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

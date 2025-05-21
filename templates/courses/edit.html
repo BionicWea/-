@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑课程{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">编辑课程</h1>
+    <p class="mb-4">修改以下信息编辑课程。</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">编辑课程表单</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('courses.edit_course', id=course._id) }}" method="post">
+                <div class="form-group">
+                    <label for="course_id">课程编号:</label>
+                    <input type="text" class="form-control" id="course_id" name="course_id" value="{{ course.course_id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="course_name">课程名称:</label>
+                    <input type="text" class="form-control" id="course_name" name="course_name" value="{{ course.course_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="classroom_id">所属班级:</label>
+                    <select class="form-control" id="classroom_id" name="classroom_id" required>
+                        <option value="">请选择班级</option>
+                        {% for classroom in classrooms %}
+                        <option value="{{ classroom._id }}" {% if classroom._id == course.classroom_id %}selected{% endif %}>{{ classroom.classroom_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="teacher_name">授课教师:</label>
+                    <input type="text" class="form-control" id="teacher_name" name="teacher_name" value="{{ course.teacher_name if course.teacher_name is not none else '' }}">
+                </div>
+                <button type="submit" class="btn btn-primary">保存修改</button>
+                <a href="{{ url_for('courses.list_courses') }}" class="btn btn-secondary">取消</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

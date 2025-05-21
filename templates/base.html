@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{# 设置文档语言为中文 #}
+<html lang="zh-CN">
+<head>
+    {# 设置字符编码为 UTF-8 #}
+    <meta charset="UTF-8">
+    {# 设置视口，确保页面在不同设备上正常显示 #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# 页面标题，可以通过 block title 进行覆盖，默认为“学生成绩管理系统” #}
+    <title>{% block title %}学生成绩管理系统{% endblock %}</title>
+    {# 引入 Bootstrap CSS 文件 #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/css/bootstrap.min.css') }}">
+    {# 引入自定义样式文件 #}
+    {# 引入 jQuery CDN #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {# 引入额外的自定义样式文件 #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    {# 包含导航栏模板 #}
+    {% include 'includes/nav.html' %}
+    {# 主内容容器 #}
+    <div class="container">
+        {# 页面主要内容块，可以通过 block content 进行覆盖 #}
+        {% block content %}
+        {% endblock %}
+    </div>
+    {# 引入 Bootstrap JavaScript 文件，包含 Popper.js #}
+    <script src="{{ url_for('static', filename='js/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {# 引入自定义 JavaScript 文件 #}
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

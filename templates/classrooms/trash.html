@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}班级回收站{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">班级回收站</h1>
+    <p class="mb-4">以下是被软删除的班级列表。</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">已删除班级列表</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <a href="{{ url_for('classrooms.list_classrooms') }}" class="btn btn-secondary btn-sm mb-3">返回班级列表</a>
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>班级编号</th>
+                            <th>班级名称</th>
+                            <th>所属学院</th>
+                            <th>入学年份</th>
+                            <th>删除时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for classroom in classrooms %}
+                        <tr>
+                            <td>{{ classroom._id }}</td>
+                            <td>{{ classroom.classroom_id }}</td>
+                            <td>{{ classroom.classroom_name }}</td>
+                            <td>{{ colleges.get(classroom.college_id, '未知学院') }}</td>
+                            <td>{{ classroom.entry_year if classroom.entry_year is not none else 'N/A' }}</td>
+                            <td>{{ classroom.deleted_at | default('N/A', true) }}</td>
+                            <td>
+                                <form action="{{ url_for('classrooms.restore_classroom', id=classroom._id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('确定要恢复该班级吗？');">恢复</button>
+                                </form>
+                                {# TODO: Add permanent delete button #}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

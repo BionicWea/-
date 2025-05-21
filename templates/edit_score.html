@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{# 设置页面标题 #}
+{% block title %}编辑学生成绩{% endblock %}
+
+{# 页面主要内容块 #}
+{% block content %}
+    {# 容器，提供内边距和顶部外边距 #}
+    <div class="container mt-4">
+        {# 页面主标题 #}
+        <h1 class="mb-3">编辑学生成绩</h1>
+        {# 表单，使用 POST 方法提交数据 #}
+        <form method="post">
+            {# 学号输入框，显示当前学生的学号 #}
+            <div class="mb-3">
+                <label for="sno" class="form-label">学号:</label>
+                <input type="text" class="form-control" id="sno" name="sno" value="{{ student.Sno }}" required>
+            </div>
+
+            {# 姓名输入框，显示当前学生的姓名 #}
+            <div class="mb-3">
+                <label for="sname" class="form-label">姓名:</label>
+                <input type="text" class="form-control" id="sname" name="sname" value="{{ student.Sname }}" required>
+            </div>
+
+            {# 科目成绩标题 #}
+            <h2 class="mt-4 mb-3">科目成绩:</h2>
+            {# 科目成绩输入框的容器，用于动态添加 #}
+            <div id="subjects-container">
+                {# 遍历当前学生的科目成绩列表 #}
+                {% for subject in student.subjects %}
+                {# 每个科目成绩的输入组 #}
+                <div class="row mb-3">
+                    {# 科目名称输入框，显示当前科目名称 #}
+                    <div class="col">
+                        <label for="subject_name_{{ loop.index }}" class="form-label">科目名称:</label>
+                        <input type="text" class="form-control" id="subject_name_{{ loop.index }}" name="subjects[{{ loop.index0 }}][name]" value="{{ subject.name }}" required>
+                    </div>
+                    {# 科目分数输入框，显示当前科目分数 #}
+                    <div class="col">
+                        <label for="subject_score_{{ loop.index }}" class="form-label">分数:</label>
+                        <input type="number" class="form-control" id="subject_score_{{ loop.index }}" name="subjects[{{ loop.index0 }}][score]" value="{{ subject.score }}" required>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {# 添加科目按钮，点击调用 addSubjectField() JavaScript 函数 #}
+            <button type="button" class="btn btn-secondary mb-3" onclick="addSubjectField()">添加科目</button>
+
+            {# 入学年份输入框 (可选)，显示当前学生的入学年份 #}
+            <div class="mb-3">
+                <label for="entry_year" class="form-label">入学年份 (可选):</label>
+                <input type="number" class="form-control" id="entry_year" name="entry_year" value="{{ student.entry_year if student.entry_year is defined else '' }}">
+            </div>
+
+            {# 专业输入框 (可选)，显示当前学生的专业 #}
+            <div class="mb-3">
+                <label for="major" class="form-label">专业 (可选):</label>
+                <input type="text" class="form-control" id="major" name="major" value="{{ student.major if student.major is defined else '' }}">
+            </div>
+
+            {# 更新按钮 #}
+            <button type="submit" class="btn btn-primary">更新</button>
+        </form>
+    </div>
+
+    {# JavaScript 代码，用于动态添加科目成绩输入框 #}
+    <script>
+        // 记录当前科目数量，初始值为学生已有的科目数量
+        let subjectCount = {{ student.subjects|length if student.subjects is defined else 0 }};
+        // 添加科目输入框的函数
+        function addSubjectField() {
+            // 科目数量加一
+            subjectCount++;
+            // 获取科目容器元素
+            const container = document.getElementById('subjects-container');
+            // 创建新的 div 元素用于包含新的科目输入组
+            const newSubjectDiv = document.createElement('div');
+            // 设置新 div 的 HTML 内容，包含科目名称和分数输入框
+            // 注意：name 属性使用 subjects[索引][name/score] 格式，以便后端接收列表数据
+            newSubjectDiv.innerHTML = `
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="subject_name_${subjectCount}" class="form-label">科目名称:</label>
+                        <input type="text" class="form-control" id="subject_name_${subjectCount}" name="subjects[${subjectCount-1}][name]" required>
+                    </div>
+                    <div class="col">
+                        <label for="subject_score_${subjectCount}" class="form-label">分数:</label>
+                        <input type="number" class="form-control" id="subject_score_${subjectCount}" name="subjects[${subjectCount-1}][score]" required>
+                    </div>
+                </div>
+            `;
+            // 将新的科目输入组添加到容器中
+            container.appendChild(newSubjectDiv);
+        }
+    </script>
+{% endblock %}

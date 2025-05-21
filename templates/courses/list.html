@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}课程列表{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">课程管理</h1>
+    <p class="mb-4">以下是系统中的课程列表。</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">课程列表</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <a href="{{ url_for('courses.add_course') }}" class="btn btn-primary btn-sm mb-3">新增课程</a>
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>课程编号</th>
+                            <th>课程名称</th>
+                            <th>所属班级</th>
+                            <th>授课教师</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ course.course_id }}</td>
+                            <td>{{ course.course_name }}</td>
+                            <td>{{ classrooms.get(course.classroom_id, '未知班级') }}</td>
+                            <td>{{ course.teacher_name if course.teacher_name is not none else 'N/A' }}</td>
+                            <td>{{ course.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <a href="{{ url_for('courses.edit_course', id=course._id) }}" class="btn btn-warning btn-sm">编辑</a>
+                                <form action="{{ url_for('courses.delete_course', id=course._id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定删除该课程吗？');">删除</button>
+                                </form>
+                                {% if course.is_deleted %}
+                                <form action="{{ url_for('courses.restore_course', id=course._id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('确定恢复该课程吗？');">恢复</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

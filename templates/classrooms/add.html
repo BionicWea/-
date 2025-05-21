@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}添加班级{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">添加班级</h1>
+    <p class="mb-4">填写以下信息添加新班级。</p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">添加班级表单</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('classrooms.add_classroom') }}" method="post">
+                <div class="form-group">
+                    <label for="classroom_id">班级编号:</label>
+                    <input type="text" class="form-control" id="classroom_id" name="classroom_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="classroom_name">班级名称:</label>
+                    <input type="text" class="form-control" id="classroom_name" name="classroom_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="college_id">所属学院:</label>
+                    <select class="form-control" id="college_id" name="college_id" required>
+                        <option value="">请选择学院</option>
+                        {% for college in colleges %}
+                        <option value="{{ college._id }}">{{ college.college_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="entry_year">入学年份:</label>
+                    <input type="number" class="form-control" id="entry_year" name="entry_year" min="1900" max="2100">
+                </div>
+                <button type="submit" class="btn btn-primary">提交</button>
+                <a href="{{ url_for('classrooms.list_classrooms') }}" class="btn btn-secondary">取消</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

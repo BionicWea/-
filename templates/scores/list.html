@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}成绩管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- 搜索区域 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">成绩查询</h5>
+            <form id="searchForm" class="row g-3">
+                <div class="col-md-2">
+                    <input type="text" class="form-control" id="student_id" name="student_id" placeholder="学号">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" id="student_name" name="student_name" placeholder="姓名">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="subject" name="subject">
+                        <option value="">选择科目</option>
+                        <option value="数学">数学</option>
+                        <option value="语文">语文</option>
+                        <option value="英语">英语</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="exam_type" name="exam_type">
+                        <option value="">考试类型</option>
+                        <option value="期中">期中</option>
+                        <option value="期末">期末</option>
+                        <option value="平时">平时</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="status" name="status">
+                        <option value="">成绩状态</option>
+                        <option value="normal">正常</option>
+                        <option value="makeup">补考</option>
+                        <option value="delayed">缓考</option>
+                        <option value="absent">缺考</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">搜索</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="mb-3">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fas fa-file-import"></i> 导入成绩
+        </button>
+        <button class="btn btn-info" id="exportBtn">
+            <i class="fas fa-file-export"></i> 导出成绩
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='/scores/trash'">
+            <i class="fas fa-trash"></i> 回收站
+        </button>
+    </div>
+
+    <!-- 成绩列表 -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>科目</th>
+                            <th>成绩</th>
+                            <th>考试类型</th>
+                            <th>状态</th>
+                            <th>备注</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoresList">
+                        <!-- 成绩数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 导入成绩模态框 -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">导入成绩</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm">
+                    <div class="mb-3">
+                        <label class="form-label">选择Excel文件</label>
+                        <input type="file" class="form-control" accept=".xlsx,.xls" required>
+                    </div>
+                    <div class="mb-3">
+                        <a href="/static/templates/score_template.xlsx" class="text-primary">
+                            <i class="fas fa-download"></i> 下载导入模板
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="importBtn">导入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑成绩模态框 -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑成绩</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="edit_score_id">
+                    <div class="mb-3">
+                        <label class="form-label">成绩</label>
+                        <input type="number" class="form-control" id="edit_score" required min="0" max="100">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">状态</label>
+                        <select class="form-select" id="edit_status">
+                            <option value="normal">正常</option>
+                            <option value="makeup">补考</option>
+                            <option value="delayed">缓考</option>
+                            <option value="absent">缺考</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-control" id="edit_note" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveEditBtn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 加载成绩列表
+function loadScores(params = {}) {
+    // 获取 URL 中的 student_id 参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentIdFromUrl = urlParams.get('student_id');
+
+    // 如果 URL 中有 student_id，则将其添加到搜索参数中
+    if (studentIdFromUrl) {
+        params.student_id = studentIdFromUrl;
+        // 隐藏搜索表单中与学生相关的字段，因为已经按学生过滤
+        document.getElementById('student_id').closest('.col-md-2').style.display = 'none';
+        document.getElementById('student_name').closest('.col-md-2').style.display = 'none';
+    }
+
+    const queryString = new URLSearchParams(params).toString();
+    fetch(`/scores/search?${queryString}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('scoresList');
+            tbody.innerHTML = '';
+            
+            data.forEach(score => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${score.student_id}</td>
+                    <td>${score.student_name}</td>
+                    <td>${score.subject}</td>
+                    <td>${score.score}</td>
+                    <td>${score.exam_type}</td>
+                    <td>${score.status}</td>
+                    <td>${score.note || ''}</td>
+                    <td>${new Date(score.created_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editScore('${score._id}')">编辑</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteScore('${score._id}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+}
+
+// 搜索表单提交
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const params = Object.fromEntries(formData);
+    loadScores(params);
+});
+
+// 编辑成绩
+function editScore(scoreId) {
+    fetch(`/scores/search?_id=${scoreId}`)
+        .then(response => response.json())
+        .then(data => {
+            const score = data[0];
+            document.getElementById('edit_score_id').value = score._id;
+            document.getElementById('edit_score').value = score.score;
+            document.getElementById('edit_status').value = score.status;
+            document.getElementById('edit_note').value = score.note || '';
+            
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        });
+}
+
+// 保存编辑
+document.getElementById('saveEditBtn').addEventListener('click', function() {
+    const scoreId = document.getElementById('edit_score_id').value;
+    const formData = new FormData();
+    formData.append('score', document.getElementById('edit_score').value);
+    formData.append('status', document.getElementById('edit_status').value);
+    formData.append('note', document.getElementById('edit_note').value);
+    
+    fetch(`/scores/update/${scoreId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            // 重新加载成绩列表，保持当前过滤状态
+            loadScores(Object.fromEntries(new URLSearchParams(window.location.search)));
+        }
+    });
+});
+
+// 删除成绩
+function deleteScore(scoreId) {
+    if (confirm('确定要删除这条成绩记录吗？')) {
+        fetch(`/scores/delete/${scoreId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 重新加载成绩列表，保持当前过滤状态
+                loadScores(Object.fromEntries(new URLSearchParams(window.location.search)));
+            }
+        });
+    }
+}
+
+// 导出成绩
+document.getElementById('exportBtn').addEventListener('click', function() {
+    const formData = new FormData(document.getElementById('searchForm'));
+    const params = Object.fromEntries(formData);
+    // 同样检查 URL 中的 student_id 参数并添加到导出参数中
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentIdFromUrl = urlParams.get('student_id');
+    if (studentIdFromUrl) {
+        params.student_id = studentIdFromUrl;
+    }
+    const queryString = new URLSearchParams(params).toString();
+    window.location.href = `/scores/export?${queryString}`;
+});
+
+// 页面加载完成后加载成绩列表
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始加载时，从 URL 获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialParams = Object.fromEntries(urlParams);
+    loadScores(initialParams);
+});
+</script>
+{% endblock %}
